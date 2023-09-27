@@ -19,11 +19,7 @@ const LoginPage = () => {
     } catch (error) {}
   };
   return (
-    <Row
-      justify={"center"}
-      align="middle"
-      style={{ minHeight: "100vh", backgroundColor: "#ffffff" }}
-    >
+    <Row justify={"center"} align="middle" style={{ minHeight: "100vh" }}>
       <Col sm={12} md={12} lg={8}>
         <Image src={LoginImage} width={500} alt={"login-image"} />
       </Col>
