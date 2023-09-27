@@ -3,13 +3,7 @@
 import { Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import React, { FC, useState } from "react";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+
 import { USER_ROLE } from "@/constants/role";
 import { SidebarItem } from "@/constants/SidebarItem";
 
