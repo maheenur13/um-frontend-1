@@ -18,3 +18,13 @@ export const getUserInfo = () => {
     return {};
   }
 };
+
+export const isLoggedInUser = () => {
+  const authLocalStorageData = getFromLocalStorage(authKey);
+  return !!authLocalStorageData;
+};
+
+export const removeUserInfo = () => {
+  return localStorage.removeItem(authKey);
+
+};

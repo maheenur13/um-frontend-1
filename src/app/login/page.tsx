@@ -8,6 +8,7 @@ import FormInput from "@/components/Forms/FormInput";
 import { SubmitHandler } from "react-hook-form";
 import { useUserLoginMutation } from "@/store/api/auth-api";
 import { getUserInfo, storeUserInfo } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
 
 type IFormValues = {
   id: string;
@@ -15,12 +16,15 @@ type IFormValues = {
 };
 
 const LoginPage = () => {
+  const router = useRouter();
   const [userLogin] =useUserLoginMutation();
   const onSubmit: SubmitHandler<IFormValues> = async (data) => {
     try {
       const result = await userLogin({...data}).unwrap();
-      console.log(result);
-      
+      if(result.data.accessToken) {
+        router.push('/profile')
+      }
+       
       storeUserInfo({accessToken:result.data.accessToken})
       
     } catch (error) {
@@ -28,7 +32,7 @@ const LoginPage = () => {
     }
   };
 
-  getUserInfo()
+
   return (
     <Row justify={"center"} align="middle" style={{ minHeight: "100vh" }}>
       <Col sm={12} md={12} lg={8}>

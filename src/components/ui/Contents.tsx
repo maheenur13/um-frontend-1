@@ -3,6 +3,7 @@
 import { Layout } from "antd";
 import React, { FC, ReactNode } from "react";
 import BreadCrumbWrapper from "./BreadCrumb";
+import Header from "./Header";
 
 type PropsType = {
   children: ReactNode;
@@ -20,6 +21,7 @@ const ContentWrapper: FC<PropsType> = ({ children }) => {
         color: "darkgray",
       }}
     >
+      <Header/>
       <BreadCrumbWrapper
         items={[
           {
@@ -32,7 +34,9 @@ const ContentWrapper: FC<PropsType> = ({ children }) => {
           },
         ]}
       />
-      {children}
+     
+     {children}
+    
     </Content>
   );
 };
