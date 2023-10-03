@@ -6,6 +6,7 @@ import React, { FC, useState } from "react";
 
 import { USER_ROLE } from "@/constants/role";
 import { SidebarItem } from "@/constants/SidebarItem";
+import { getUserInfo } from "@/services/auth.service";
 
 const { Sider } = Layout;
 
@@ -14,7 +15,8 @@ type MenuItem = Required<MenuProps>["items"][number];
 const SideBar: FC = () => {
   const [collapsed, setCollapsed] = useState(false);
 
-  const role = USER_ROLE.SUPER_ADMIN;
+  const { role } = getUserInfo();
+  // const role = USER_ROLE.SUPER_ADMIN;
 
   return (
     <Sider

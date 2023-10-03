@@ -10,7 +10,7 @@ export const storeUserInfo = ({ accessToken }: IParamType) => {
   setToLocalStorage(authKey, accessToken);
 };
 
-export const getUserInfo = () => {
+export const getUserInfo = ():any => {
   const authLocalStorageData = getFromLocalStorage(authKey);
   if (authLocalStorageData) {
     return decodedToken(authLocalStorageData);

@@ -1,9 +1,26 @@
 "use client";
+
+import { Button, Result, Row } from "antd";
+
 const Error = () => {
   return (
-    <div>
-      <h2>Error</h2>
-    </div>
+    <Row
+      justify={"center"}
+      align={"middle"}
+      style={{
+        height: "100vh",
+      }}
+    >
+      <Result
+        status="warning"
+        title="There are some problems with your operation."
+        extra={
+          <Button type="primary" key="console">
+            Go Console
+          </Button>
+        }
+      />
+    </Row>
   );
 };
 

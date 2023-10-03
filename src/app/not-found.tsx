@@ -1,10 +1,22 @@
+import { Button, Result, Row } from "antd";
 import React from "react";
 
 const NotFound = () => {
   return (
-    <div>
-      <h2>Page not found</h2>
-    </div>
+    <Row
+      justify={"center"}
+      align={"middle"}
+      style={{
+        height: "100vh",
+      }}
+    >
+      <Result
+        status="404"
+        title="404"
+        subTitle="Sorry, the page you visited does not exist."
+        extra={<Button type="primary">Back Home</Button>}
+      />
+    </Row>
   );
 };
 
