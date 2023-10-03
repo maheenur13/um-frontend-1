@@ -2,11 +2,12 @@ import { Col, Dropdown, Layout, Row, Button, Avatar, Space } from "antd";
 import type { MenuProps } from "antd";
 import React from "react";
 import { UserOutlined } from "@ant-design/icons";
-import { removeUserInfo } from "@/services/auth.service";
+import { getUserInfo, removeUserInfo } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 
 const { Header: AntHeader } = Layout;
 const Header = () => {
+  const { role } = getUserInfo();
   const router = useRouter();
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // message.info('Click on left button.');
@@ -40,6 +41,16 @@ const Header = () => {
       }}
     >
       <Row justify={"end"} align={"middle"}>
+        <Col>
+          {" "}
+          <p
+            style={{
+              marginRight: 8,
+            }}
+          >
+            {role}
+          </p>
+        </Col>
         <Col>
           <Dropdown menu={menuProps}>
             <Space wrap size={16}>

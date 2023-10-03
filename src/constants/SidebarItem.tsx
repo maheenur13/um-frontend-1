@@ -21,8 +21,8 @@ export const SidebarItem = (role: string) => {
       label: "Profile",
       children: [
         {
-          label: <Link href={`/${role}/profile`}>Account Profile</Link>,
-          key: `${role}/profile`,
+          label: <Link href={`/${role}`}>Account Profile</Link>,
+          key: `${role}`,
           icon: <UserOutlined />,
         },
         {
@@ -37,12 +37,12 @@ export const SidebarItem = (role: string) => {
     {
       key: `${role}/manage-students`,
       icon: <TableOutlined />,
-      label: <Link href={`/${role}/manage-student`}>Manage Students</Link>,
+      label: <Link href={`/${role}/manage-students`}>Manage Students</Link>,
     },
     {
       key: `${role}/manage-faculty`,
       icon: <TableOutlined />,
-      label: <Link href={`/${role}/manage-faculty`}>Manage Faculties</Link>,
+      label: <Link href={`/${role}/manage-faculties`}>Manage Faculties</Link>,
     },
   ];
 
@@ -125,34 +125,24 @@ export const SidebarItem = (role: string) => {
     ...defaultItems,
     ...commonAdminItems,
     {
-      label: <Link href={`/${role}/admin`}>Manage Admin</Link>,
+      label: <Link href={`/${role}/admins`}>Manage Admin</Link>,
       icon: <TableOutlined />,
-      key: `/${role}/admin`,
+      key: `/${role}/admins`,
     },
     {
-      label: <Link href={`/${role}/user`}>Manage User</Link>,
+      label: <Link href={`/${role}/users`}>Manage User</Link>,
       icon: <TableOutlined />,
-      key: `/${role}/user`,
+      key: `/${role}/users`,
     },
-    {
-      label: "Manage permission",
-      key: "manage-permission",
-      icon: <AppstoreOutlined />,
-      children: [
-        {
-          label: <Link href={`/${role}/permission`}>View permissions</Link>,
-          key: `/${role}/permission`,
-        },
-      ],
-    },
+   
     {
       label: "Management",
       key: "management",
       icon: <AppstoreOutlined />,
       children: [
         {
-          label: <Link href={`/${role}/department`}>Department</Link>,
-          key: `/${role}/department`,
+          label: <Link href={`/${role}/departments`}>Department</Link>,
+          key: `/${role}/departments`,
         },
       ],
     },
@@ -200,7 +190,7 @@ export const SidebarItem = (role: string) => {
     role === "student"
       ? studentItems
       : role === "admin"
-      ? commonAdminItems
+      ? adminItems
       : role === "super_admin"
       ? superAdminItems
       : role === "faculty"

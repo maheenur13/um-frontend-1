@@ -1,8 +1,7 @@
 "use client";
 
-import { Layout } from "antd";
+import { Layout, Space } from "antd";
 import React, { FC, ReactNode } from "react";
-import BreadCrumbWrapper from "./BreadCrumb";
 import Header from "./Header";
 
 type PropsType = {
@@ -22,20 +21,13 @@ const ContentWrapper: FC<PropsType> = ({ children }) => {
       }}
     >
       <Header/>
-      <BreadCrumbWrapper
-        items={[
-          {
-            label: `${base}`,
-            link: `/${base}`,
-          },
-          {
-            label: `${"student"}`,
-            link: `/${"student"}`,
-          },
-        ]}
-      />
      
-     {children}
+     
+    <div style={{
+      padding:12
+    }}>
+    {children}
+    </div>
     
     </Content>
   );

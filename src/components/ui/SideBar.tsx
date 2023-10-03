@@ -4,7 +4,6 @@ import { Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import React, { FC, useState } from "react";
 
-import { USER_ROLE } from "@/constants/role";
 import { SidebarItem } from "@/constants/SidebarItem";
 import { getUserInfo } from "@/services/auth.service";
 
