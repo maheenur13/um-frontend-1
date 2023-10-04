@@ -1,13 +1,13 @@
 "use client";
 
+import ActionBar from "@/components/ui/ActionBar";
 import BreadCrumbWrapper from "@/components/ui/BreadCrumb";
 import { getUserInfo } from "@/services/auth.service";
 import { Button, Col, Row } from "antd";
 import Link from "next/link";
 
-
 const ManageAdmins = () => {
-  const {role}= getUserInfo();
+  const { role } = getUserInfo();
   return (
     <div>
       <BreadCrumbWrapper
@@ -18,20 +18,13 @@ const ManageAdmins = () => {
           },
         ]}
       />
-     <Row justify={'space-between'} align={'middle'}>
-        <Col>
-        <h2>Manage Admin</h2>
-        </Col>
-        <Col>
-       
-      <Link href="/super_admin/admins/create">
-        {" "}
-        <Button type="primary">Create Admin</Button>
-      </Link>
-        </Col>
-     </Row>
+      <ActionBar title="Manage Admin">
+        <Link href="/super_admin/admins/create">
+          <Button type="primary">Create Admin</Button>
+        </Link>
+      </ActionBar>
     </div>
   );
-}
+};
 
-export default ManageAdmins
+export default ManageAdmins;
