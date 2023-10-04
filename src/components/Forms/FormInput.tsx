@@ -42,7 +42,13 @@ const FormInput: FC<PropsType> = (props) => {
 
   return (
     <>
-      {label || null}
+      <div
+        style={{
+          marginBottom: 4,
+        }}
+      >
+        {label || null}
+      </div>
 
       <Controller
         control={control}
