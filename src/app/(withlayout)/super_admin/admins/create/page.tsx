@@ -14,6 +14,8 @@ import {
 import { getUserInfo } from "@/services/auth.service";
 import { Button, Col, Row } from "antd";
 import { SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { adminSchema } from "@/formSchema/admin";
 
 const CreateAdmin = () => {
   const { role } = getUserInfo();
@@ -39,7 +41,7 @@ const CreateAdmin = () => {
           },
         ]}
       />
-      <Form submitHandler={onSubmit}>
+      <Form submitHandler={onSubmit} resolver={yupResolver(adminSchema)}>
         <div
           style={{
             border: "1px solid #d9d9d9",

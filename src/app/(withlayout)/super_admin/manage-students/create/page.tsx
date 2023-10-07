@@ -1,26 +1,50 @@
-import StepperForm from "@/components/StepperForm"
+"use client";
+
+import StepperForm from "@/components/StepperForm";
+import {
+  GuardianInfo,
+  LocalGuardianInfo,
+  StudentBasicInfo,
+  StudentInfo,
+} from "@/components/StudentForms";
 
 const CreateStudent = () => {
   const steps = [
     {
-      title: 'First',
-      content: 'First-content',
+      title: "Student Information",
+      content: <StudentInfo />,
     },
     {
-      title: 'Second',
-      content: 'Second-content',
+      title: "Student Basic Information",
+      content: <StudentBasicInfo />,
     },
     {
-      title: 'Last',
-      content: 'Last-content',
+      title: "Guardian Info",
+      content: <GuardianInfo />,
+    },
+    {
+      title: "Local Guardian Info",
+      content: <LocalGuardianInfo />,
     },
   ];
+
+  const handleSubmit = async (data: any) => {
+    try {
+      console.log(data);
+    } catch (error: any) {
+      console.error(error?.message);
+    }
+  };
+
   return (
     <div>
       <h2>Create Student</h2>
-      <StepperForm steps={steps} />
+      <StepperForm
+        submitHandler={(values: any) => handleSubmit(values)}
+        steps={steps}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default CreateStudent
+export default CreateStudent;
