@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Col, Row } from "antd";
+import { Button, Col, Row, message } from "antd";
 import Image from "next/image";
 import React, { FC } from "react";
 import Form from "../Forms/Form";
@@ -18,7 +18,7 @@ type IFormValues = {
 
 const LoginComp: FC = () => {
   const router = useRouter();
-  const [userLogin] = useUserLoginMutation();
+  const [userLogin, { isLoading }] = useUserLoginMutation();
   const onSubmit: SubmitHandler<IFormValues> = async (data) => {
     try {
       const result = await userLogin({ ...data }).unwrap();
@@ -26,6 +26,7 @@ const LoginComp: FC = () => {
 
       if (result?.accessToken) {
         router.push("/profile");
+        message.success("User logged in successfully");
       }
 
       storeUserInfo({ accessToken: result.accessToken });
@@ -48,7 +49,7 @@ const LoginComp: FC = () => {
             <div style={{ margin: "15px 0px" }}>
               <FormInput type="password" name="password" label="Password" />
             </div>
-            <Button type="primary" htmlType="submit">
+            <Button loading={isLoading} type="primary" htmlType="submit">
               Login
             </Button>
           </Form>

@@ -1,19 +1,50 @@
 "use client";
 
-import React, { ReactElement, ReactNode, useState } from "react";
+import React, { ReactElement, ReactNode, useEffect, useState } from "react";
 import { Button, message, Steps } from "antd";
 import type { StepsProps } from "antd";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { getFromLocalStorage, setToLocalStorage } from "@/utils/local-storage";
+import { useRouter } from "next/navigation";
 type ISteps = {
   title: string;
   content: ReactNode | ReactElement;
 };
+type FormConfig = {
+  defaultValues?: Record<string, any>;
+};
 
 type PropsType = {
   steps: ISteps[];
+  submitHandler: (values: any) => Promise<void>;
+  navigateLink?: string;
 };
+type IFormPropsType = {
+  children?: ReactNode | ReactElement;
+  submitHandler: SubmitHandler<any>;
+} & FormConfig;
 
-const StepperForm: React.FC<PropsType> = ({ steps }) => {
-  const [current, setCurrent] = useState(0);
+const StepperForm: React.FC<PropsType> = ({
+  steps,
+  submitHandler,
+  navigateLink,
+}) => {
+  const router = useRouter();
+  const [current, setCurrent] = useState<number>(0);
+
+  const stepValue = !!getFromLocalStorage("step")
+    ? Number(JSON.parse(getFromLocalStorage("step") as string)?.step)
+    : 0;
+  const formConfig: FormConfig = {};
+
+  useEffect(() => {
+    setToLocalStorage("step", JSON.stringify({ ["step"]: current }));
+  }, [current]);
+
+  // if (!!defaultValues) formConfig["defaultValues"] = defaultValues;
+
+  const methods = useForm<IFormPropsType>(formConfig);
+  const { handleSubmit, reset } = methods;
 
   const next = () => {
     setCurrent(current + 1);
@@ -28,30 +59,44 @@ const StepperForm: React.FC<PropsType> = ({ steps }) => {
     title: item.title,
   }));
 
+  const onSubmit = (data: any) => {
+    submitHandler(data);
+    reset();
+    setToLocalStorage("step", JSON.stringify({ ["step"]: 0 }));
+    if (navigateLink) {
+      router.push(navigateLink);
+    }
+  };
+
   return (
     <>
       <Steps current={current} items={items} />
-      <div>{steps[current].content}</div>
-      <div style={{ marginTop: 24 }}>
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            onClick={() => message.success("Processing complete!")}
-          >
-            Done
-          </Button>
-        )}
-        {current > 0 && (
-          <Button style={{ margin: "0 8px" }} onClick={() => prev()}>
-            Previous
-          </Button>
-        )}
-      </div>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div>{steps[current].content}</div>
+          <div style={{ marginTop: 24 }}>
+            {current < steps.length - 1 && (
+              <Button type="primary" onClick={() => next()}>
+                Next
+              </Button>
+            )}
+            {current === steps.length - 1 && (
+              <Button
+                htmlType="submit"
+                type="primary"
+                onClick={() => message.success("Processing complete!")}
+              >
+                Done
+              </Button>
+            )}
+            {current > 0 && (
+              <Button style={{ margin: "0 8px" }} onClick={() => prev()}>
+                Previous
+              </Button>
+            )}
+          </div>
+        </form>
+      </FormProvider>
     </>
   );
 };
