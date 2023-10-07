@@ -5,6 +5,7 @@ import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 
 type FormConfig = {
   defaultValues?: Record<string, any>;
+  resolver?: any;
 };
 
 type PropsType = {
@@ -12,10 +13,16 @@ type PropsType = {
   submitHandler: SubmitHandler<any>;
 } & FormConfig;
 
-const Form: FC<PropsType> = ({ children, submitHandler, defaultValues }) => {
+const Form: FC<PropsType> = ({
+  children,
+  submitHandler,
+  defaultValues,
+  resolver,
+}) => {
   const formConfig: FormConfig = {};
 
   if (!!defaultValues) formConfig["defaultValues"] = defaultValues;
+  if (!!resolver) formConfig["resolver"] = resolver;
 
   const methods = useForm<PropsType>(formConfig);
   const { handleSubmit, reset } = methods;

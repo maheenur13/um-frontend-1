@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessages } from "@/utils/schema-validator";
 import { Input } from "antd";
 import { FC } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -37,8 +38,13 @@ interface PropsType {
   label?: string;
 }
 const FormInput: FC<PropsType> = (props) => {
-  const { name, type, id, placeholder, size, validate, value, label } = props;
-  const { control } = useFormContext();
+  const { name, type, value, label, ...rest } = props;
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const errorMessages = getErrorMessages(errors, name);
 
   return (
     <>
@@ -61,10 +67,16 @@ const FormInput: FC<PropsType> = (props) => {
               value={value || field.value}
             />
           ) : (
-            <Input type={type} {...field} value={value || field.value} />
+            <Input
+              type={type}
+              {...field}
+              value={value || field.value}
+              {...rest}
+            />
           )
         }
       />
+      <small style={{ color: "red" }}>{errorMessages}</small>
     </>
   );
 };
