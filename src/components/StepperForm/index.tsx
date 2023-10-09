@@ -18,6 +18,7 @@ type PropsType = {
   steps: ISteps[];
   submitHandler: (values: any) => Promise<void>;
   navigateLink?: string;
+  persistKey?: string;
 };
 type IFormPropsType = {
   children?: ReactNode | ReactElement;
@@ -28,13 +29,21 @@ const StepperForm: React.FC<PropsType> = ({
   steps,
   submitHandler,
   navigateLink,
+  persistKey,
 }) => {
   const router = useRouter();
-  const [current, setCurrent] = useState<number>(0);
+  const [current, setCurrent] = useState<number>(
+    !!getFromLocalStorage("step")
+      ? Number(JSON.parse(getFromLocalStorage("step") as string)?.step)
+      : 0
+  );
 
-  const stepValue = !!getFromLocalStorage("step")
-    ? Number(JSON.parse(getFromLocalStorage("step") as string)?.step)
-    : 0;
+  const [savedValues, setSavedValues] = useState(
+    !!getFromLocalStorage(persistKey as string)
+      ? JSON.parse(getFromLocalStorage(persistKey as string) as string)
+      : ""
+  );
+
   const formConfig: FormConfig = {};
 
   useEffect(() => {
@@ -43,7 +52,7 @@ const StepperForm: React.FC<PropsType> = ({
 
   // if (!!defaultValues) formConfig["defaultValues"] = defaultValues;
 
-  const methods = useForm<IFormPropsType>(formConfig);
+  const methods = useForm({ defaultValues: savedValues });
   const { handleSubmit, reset } = methods;
 
   const next = () => {
@@ -58,6 +67,12 @@ const StepperForm: React.FC<PropsType> = ({
     key: item.title,
     title: item.title,
   }));
+
+  const watch = methods.watch();
+
+  useEffect(() => {
+    setToLocalStorage(persistKey as string, JSON.stringify(watch));
+  }, [watch, persistKey, methods]);
 
   const onSubmit = (data: any) => {
     submitHandler(data);
