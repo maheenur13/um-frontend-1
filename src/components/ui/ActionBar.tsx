@@ -8,10 +8,12 @@ type PropsType = {
 const ActionBar: FC<PropsType> = ({ title, children }) => {
   return (
     <div>
-      <h1>{title}</h1>
+      <h1 style={{ marginBottom: "10px" }}>{title}</h1>
       <div
         style={{
           display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         {children}

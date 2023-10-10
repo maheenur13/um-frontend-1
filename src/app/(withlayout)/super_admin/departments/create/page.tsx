@@ -27,7 +27,7 @@ const CreateDepartment = () => {
       <BreadCrumbWrapper
         items={[
           { label: `${role}`, link: `/${role}` },
-          { label: "department", link: `/${role}/department` },
+          { label: "department", link: `/${role}/departments` },
         ]}
       />
       <h1>Create Department</h1>

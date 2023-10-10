@@ -4,31 +4,49 @@ import BreadCrumbWrapper from "@/components/ui/BreadCrumb";
 import GlobalTable from "@/components/ui/GlobalTable";
 import { getUserInfo } from "@/services/auth.service";
 import { useGetDepartmentsQuery } from "@/store/api/department-api";
-import { Button, Col, PaginationProps, Row, Space, Tag } from "antd";
-import { ColumnsType, TablePaginationConfig, TableProps } from "antd/es/table";
-import { FilterValue, SorterResult } from "antd/es/table/interface";
+import { Button, Col, Input, Row, Space, Tag } from "antd";
+import { ColumnsType, TableProps } from "antd/es/table";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+
+import ActionBar from "@/components/ui/ActionBar";
+import { useDebounce } from "@/hooks";
+import { useRouter } from "next/navigation";
 
 interface DataType {
   key: string;
-  name: string;
-  age: number;
-  address: string;
-  tags: string[];
+  title: string;
+  createdAt: number;
+  id: string;
 }
 
 const ManageDepartment = () => {
   const query: Record<string, any> = {};
 
-  const [size, setSize] = useState<number>(10);
+  const [size, setSize] = useState<number>(6);
   const [page, setPage] = useState<number>(1);
   const [sortBy, setSortBy] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("");
-  query["size"] = size;
+
+  const debouncedValue = useDebounce<string>(searchTerm, 700);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  query["limit"] = size;
   query["page"] = page;
   query["sortBy"] = sortBy;
   query["sortOrder"] = sortOrder;
+  query["searchTerm"] = debouncedValue;
 
   const { data, isLoading } = useGetDepartmentsQuery({ ...query });
   // const { departments, meta } = data;
@@ -38,29 +56,52 @@ const ManageDepartment = () => {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
       render: (text) => <a>{text}</a>,
     },
 
     {
-      title: "Age",
-      key: "age",
-      dataIndex: "age",
-      sorter: (a, b) => a.age - b.age,
+      title: "Created At",
+      key: "createdAt",
+      dataIndex: "createdAt",
+      sorter: true,
+      render: (date) => {
+        return date && dayjs(date).format("MMM D, YYYY hh:mm A");
+      },
     },
     {
       title: "Action",
       key: "action",
+      width: 200,
       render: (_, record) => (
         <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+          <Button
+            onClick={() => handleDelete(record)}
+            type="primary"
+            icon={<EyeOutlined />}
+            size={"middle"}
+          />
+
+          <Link href={`/super_admin/departments/edit/${record.id}`}>
+            <Button type="primary" icon={<EditOutlined />} size={"middle"} />
+          </Link>
+          <Button
+            onClick={() => handleDelete(record)}
+            type="primary"
+            icon={<DeleteOutlined />}
+            size={"middle"}
+            danger
+          />
         </Space>
       ),
     },
   ];
+
+  const handleDelete = (data: DataType) => {
+    console.log(data);
+  };
 
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPage(page);
@@ -74,9 +115,15 @@ const ManageDepartment = () => {
     // const { order, field } = sorter;
     const { order, field } = sorter as any;
     setSortBy(field as string);
-    console.log(order);
+
     setSortOrder(order === "ascend" ? "asc" : "desc");
     // console.log(field);
+  };
+
+  const handleReset = () => {
+    setSortBy("");
+    setSortOrder("");
+    setSearchTerm("");
   };
 
   return (
@@ -90,38 +137,42 @@ const ManageDepartment = () => {
         ]}
       />
       <Row justify={"space-between"} align={"middle"}>
-        <Col>
-          <h2>Manage Department</h2>
+        <Col span={24} style={{ margin: "10px 0" }}>
+          <ActionBar title="Manage Department">
+            <Input
+              placeholder="Search"
+              size="large"
+              onChange={handleChange}
+              style={{ width: "20%" }}
+            />
+            <div>
+              {(!!sortBy || !!sortOrder || !!searchTerm) && (
+                <Button
+                  onClick={handleReset}
+                  size="large"
+                  style={{ marginRight: "10px" }}
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                />
+              )}
+              <Link href="/super_admin/departments/create">
+                <Button size="large" type="primary">
+                  Create Department
+                </Button>
+              </Link>
+            </div>
+          </ActionBar>
         </Col>
-        <Col>
-          <Link href="/super_admin/departments/create">
-            <Button type="primary">Create Department</Button>
-          </Link>
-        </Col>
-        <Col span={24}>
+        <Col
+          span={24}
+          style={{
+            margin: "10px 0",
+          }}
+        >
           <GlobalTable
-            dataSource={[
-              {
-                key: "1",
-                name: "John Brown",
-                age: 32,
-              },
-              {
-                key: "2",
-                name: "Jim Green",
-                age: 42,
-              },
-              {
-                key: "3",
-                name: "Joe Black",
-                age: 32,
-              },
-              {
-                key: "4",
-                name: "Jim Red",
-                age: 32,
-              },
-            ]}
+            total={data?.meta?.total as number}
+            pageSize={size}
+            dataSource={data?.departments || ([] as any)}
             columns={columns}
             loading={isLoading}
             onTableChange={handleTableChange}
