@@ -28,9 +28,25 @@ const departmentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.department],
     }),
+    getDepartmentById: build.query({
+      query: (id: string) => ({
+        url: `${DEPARTMENT_URL}/${id}`,
+        method: "GET",
+      }),
+      transformResponse: async (response: IDepartment, meta: IMeta) => {
+        return {
+          departments: response,
+          meta,
+        };
+      },
+      providesTags: [tagTypes.department],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateDepartmentMutation, useGetDepartmentsQuery } =
-  departmentApi;
+export const {
+  useCreateDepartmentMutation,
+  useGetDepartmentsQuery,
+  useGetDepartmentByIdQuery,
+} = departmentApi;
