@@ -5,7 +5,10 @@ import FormInput from "@/components/Forms/FormInput";
 import ActionBar from "@/components/ui/ActionBar";
 import BreadCrumbWrapper from "@/components/ui/BreadCrumb";
 import { getUserInfo } from "@/services/auth.service";
-import { useGetDepartmentByIdQuery } from "@/store/api/department-api";
+import {
+  useGetDepartmentByIdQuery,
+  useUpdateDepartmentMutation,
+} from "@/store/api/department-api";
 import { Button, Col, Row, message } from "antd";
 import { FC } from "react";
 
@@ -19,10 +22,18 @@ const EditDepartment: FC<PropsType> = (props) => {
   const { data: departmentData, isLoading } = useGetDepartmentByIdQuery(
     props.params.id
   );
-  const onSubmit = async (data: any) => {
-    message.loading("Updating.....");
+  const [updateDepartment] = useUpdateDepartmentMutation();
+
+  const onSubmit = async (values: any) => {
+    // message.loading("Updating.....");
     try {
-      message.success("Department added successfully");
+      const result: any = await updateDepartment({
+        id: props.params.id,
+        body: values,
+      });
+      if (result?.data) {
+        message.success("Department updated successfully");
+      }
     } catch (err: any) {
       console.error(err.message);
       message.error(err.message);
@@ -56,7 +67,7 @@ const EditDepartment: FC<PropsType> = (props) => {
           </Col>
         </Row>
         <Button type="primary" htmlType="submit">
-          add
+          Update
         </Button>
       </Form>
     </div>
