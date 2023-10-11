@@ -3,8 +3,11 @@
 import BreadCrumbWrapper from "@/components/ui/BreadCrumb";
 import GlobalTable from "@/components/ui/GlobalTable";
 import { getUserInfo } from "@/services/auth.service";
-import { useGetDepartmentsQuery } from "@/store/api/department-api";
-import { Button, Col, Input, Row, Space, Tag } from "antd";
+import {
+  useDeleteDepartmentMutation,
+  useGetDepartmentsQuery,
+} from "@/store/api/department-api";
+import { Button, Col, Input, Row, Space, Tag, message } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
 import Link from "next/link";
 import React, { ChangeEvent, useState } from "react";
@@ -18,7 +21,6 @@ import dayjs from "dayjs";
 
 import ActionBar from "@/components/ui/ActionBar";
 import { useDebounce } from "@/hooks";
-import { useRouter } from "next/navigation";
 
 interface DataType {
   key: string;
@@ -48,7 +50,11 @@ const ManageDepartment = () => {
   query["sortOrder"] = sortOrder;
   query["searchTerm"] = debouncedValue;
 
-  const { data, isLoading } = useGetDepartmentsQuery({ ...query });
+  const { data, isLoading: getLoading } = useGetDepartmentsQuery({ ...query });
+  const [updateDepartment, { isLoading: isDeleteLoading }] =
+    useDeleteDepartmentMutation();
+
+  const isLoading = getLoading || isDeleteLoading;
   // const { departments, meta } = data;
   // console.log(data);
 
@@ -99,8 +105,19 @@ const ManageDepartment = () => {
     },
   ];
 
-  const handleDelete = (data: DataType) => {
-    console.log(data);
+  const handleDelete = async (values: any) => {
+    // message.loading("Updating.....");
+    try {
+      const result: any = await updateDepartment({
+        id: values.id,
+      });
+      if (result?.data) {
+        message.success("Department deleted successfully");
+      }
+    } catch (err: any) {
+      console.error(err.message);
+      message.error(err.message);
+    }
   };
 
   const handlePaginationChange = (page: number, pageSize: number) => {

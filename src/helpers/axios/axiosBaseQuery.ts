@@ -1,22 +1,23 @@
-import { IMeta } from "@/interfaces";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
-import axios from "axios";
 import type { AxiosRequestConfig, AxiosError } from "axios";
 import { instance as axiosInstance } from "./axiosInstance";
-
-type IBaseQueryFn = {
-  url: string;
-  method: AxiosRequestConfig["method"];
-  data?: AxiosRequestConfig["data"];
-  params?: AxiosRequestConfig["params"];
-  meta?: IMeta;
-  contentType?: string;
-};
+import { IMeta } from "@/interfaces";
 
 export const axiosBaseQuery =
   (
     { baseUrl }: { baseUrl: string } = { baseUrl: "" }
-  ): BaseQueryFn<IBaseQueryFn, unknown, unknown> =>
+  ): BaseQueryFn<
+    {
+      url: string;
+      method: AxiosRequestConfig["method"];
+      data?: AxiosRequestConfig["data"];
+      params?: AxiosRequestConfig["params"];
+      meta?: IMeta;
+      contentType?: string;
+    },
+    unknown,
+    unknown
+  > =>
   async ({ url, method, data, params, contentType }) => {
     try {
       const result = await axiosInstance({
@@ -25,8 +26,9 @@ export const axiosBaseQuery =
         data,
         params,
         headers: {
-          contentType: contentType || "application/json",
+          "Content-Type": contentType || "application/json",
         },
+        // withCredentials: true,
       });
       return result;
     } catch (axiosError) {
@@ -39,17 +41,3 @@ export const axiosBaseQuery =
       };
     }
   };
-
-// const api = createApi({
-//   baseQuery: axiosBaseQuery({
-//     baseUrl: 'https://example.com',
-//   }),
-//   endpoints(build) {
-//     return {
-//       query: build.query({ query: () => ({ url: '/query', method: 'get' }) }),
-//       mutation: build.mutation({
-//         query: () => ({ url: '/mutation', method: 'post' }),
-//       }),
-//     }
-//   },
-// })

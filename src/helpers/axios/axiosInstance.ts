@@ -1,23 +1,22 @@
 import { authKey } from "@/constants/storageKey";
 import { IResponseErrorResponse, ResponseSuccessType } from "@/interfaces";
-import { getFromLocalStorage } from "@/utils/local-storage";
+
+import { getFromLocalStorage, setToLocalStorage } from "@/utils/local-storage";
 import axios from "axios";
 
 const instance = axios.create();
-
 instance.defaults.headers.post["Content-Type"] = "application/json";
 instance.defaults.headers["Accept"] = "application/json";
-instance.defaults.timeout = 6000;
+instance.defaults.timeout = 60000;
 
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    const accesstoken = getFromLocalStorage(authKey);
-    if (accesstoken) {
-      config.headers.Authorization = accesstoken;
+    const accessToken = getFromLocalStorage(authKey);
+    if (accessToken) {
+      config.headers.Authorization = accessToken;
     }
-
     return config;
   },
   function (error) {
@@ -28,21 +27,26 @@ instance.interceptors.request.use(
 
 // Add a response interceptor
 instance.interceptors.response.use(
+  //@ts-ignore
   function (response) {
-    const customResponse: ResponseSuccessType = {
+    const responseObject: ResponseSuccessType = {
       data: response?.data?.data,
-      meta: response.data?.meta,
+      meta: response?.data?.meta,
     };
-
-    return customResponse as any;
+    return responseObject;
   },
-  function (error) {
-    const customError:IResponseErrorResponse = {
-      statusCode: error.response?.data?.statusCode || 500,
-      message: error.response?.data?.message || 'something went wrong!',
-      errorMessages: error.response?.data?.errorMessages,
-    };
-    return Promise.reject(customError);
+  async function (error) {
+    if (error?.response?.status === 403) {
+    } else {
+      const responseObject: IResponseErrorResponse = {
+        statusCode: error?.response?.data?.statusCode || 500,
+        message: error?.response?.data?.message || "Something went wrong",
+        errorMessages: error?.response?.data?.message,
+      };
+      return responseObject;
+    }
+
+    // return Promise.reject(error);
   }
 );
 

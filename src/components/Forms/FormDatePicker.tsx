@@ -10,7 +10,7 @@ type PropsType = DatePickerProps & {
 };
 
 const FormDatePicker: FC<PropsType> = (props) => {
-  const { name, label, onChange,value, ...rest } = props;
+  const { name, label, onChange, value, ...rest } = props;
   const { control, setValue } = useFormContext();
 
   const handleChange: DatePickerProps["onChange"] = (value, date) => {
@@ -33,10 +33,9 @@ const FormDatePicker: FC<PropsType> = (props) => {
         name={name}
         render={({ field }) => (
           <DatePicker
-            value={dayjs(field.value) || null}
             style={{ ...rest.style, width: rest.style?.width || "100%" }}
             onChange={handleChange}
-            defaultValue={dayjs(null)}
+            defaultValue={field.value ? dayjs(field.value) : undefined}
             {...rest}
           />
         )}

@@ -1,4 +1,5 @@
 "use client";
+
 import Form from "@/components/Forms/Form";
 import FormDatePicker from "@/components/Forms/FormDatePicker";
 import FormInput from "@/components/Forms/FormInput";
@@ -6,34 +7,53 @@ import FormSelectDropdown from "@/components/Forms/FormSelect";
 import FormTextArea from "@/components/Forms/FormTextArea";
 import BreadCrumbWrapper from "@/components/ui/BreadCrumb";
 import UploadImage from "@/components/ui/UploadImage";
-import {
-  bloodGroupOptions,
-  departmentOptions,
-  genderOptions,
-} from "@/constants/global";
-import { getUserInfo } from "@/services/auth.service";
-import { Button, Col, Row } from "antd";
-import { SubmitHandler } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { bloodGroupOptions, genderOptions } from "@/constants/global";
 import { adminSchema } from "@/formSchema/admin";
+import { useAddAdminWithFormDataMutation } from "@/store/api/admin-api";
+import { useGetDepartmentsQuery } from "@/store/api/department-api";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-const CreateAdmin = () => {
-  const { role } = getUserInfo();
+import { Button, Col, Row, message } from "antd";
 
-  const onSubmit: SubmitHandler<any> = async (data) => {
+const CreateAdminPage = () => {
+  const { data, isLoading } = useGetDepartmentsQuery({ limit: 100, page: 1 });
+  const [addAdminWithFormData] = useAddAdminWithFormDataMutation();
+  //@ts-ignore
+  const departments: IDepartment[] = data?.departments;
+
+  const departmentOptions =
+    departments &&
+    departments?.map((department) => {
+      return {
+        label: department?.title,
+        value: department?.id,
+      };
+    });
+
+  const onSubmit = async (values: any) => {
+    const obj = { ...values };
+    const file = obj["file"];
+    delete obj["file"];
+    const data = JSON.stringify(obj);
+    const formData = new FormData();
+    formData.append("file", file as Blob);
+    formData.append("data", data);
+    message.loading("Creating...");
     try {
-      console.log({ data });
-    } catch (error) {
-      console.error(error);
+      await addAdminWithFormData(formData);
+      message.success("Admin created successfully!");
+    } catch (err: any) {
+      console.error(err.message);
     }
   };
+
   return (
     <div>
       <BreadCrumbWrapper
         items={[
           {
-            label: `${role}`,
-            link: `/${role}`,
+            label: "super_admin",
+            link: "/super_admin",
           },
           {
             label: "admin",
@@ -41,172 +61,257 @@ const CreateAdmin = () => {
           },
         ]}
       />
-      <Form submitHandler={onSubmit} resolver={yupResolver(adminSchema)}>
-        <div
-          style={{
-            border: "1px solid #d9d9d9",
-            borderRadius: 10,
-            padding: 24,
-            margin: "10px 0",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <h3 style={{ marginBottom: 12 }}>Admin Details</h3>
-          <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.name.firstName"
-                size="large"
-                label="First Name"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.name.middleName"
-                size="large"
-                label="Middle Name"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.name.lastName"
-                size="large"
-                label="Last Name"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="password"
-                name="admin.passowrd"
-                size="large"
-                label="Password"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormSelectDropdown
-                name="admin.name.gender"
-                size="middle"
-                label="Gender"
-                placeholder="Select Gender"
-                options={genderOptions}
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormSelectDropdown
-                name="admin.name.managementDepartment"
-                size="middle"
-                label="Department"
-                placeholder="Select Department"
-                options={departmentOptions}
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <UploadImage />
-            </Col>
-          </Row>
-          <Button
-            style={{
-              marginTop: 10,
-            }}
-            type="primary"
-            htmlType="submit"
-          >
-            Submit
-          </Button>
-        </div>
-        <div
-          style={{
-            border: "1px solid #d9d9d9",
-            borderRadius: 10,
-            padding: 24,
-            margin: "10px 0",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <h3 style={{ marginBottom: 12 }}>Basic Details</h3>
-          <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="email"
-                name="admin.email"
-                size="large"
-                label="email"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.contactNo"
-                size="large"
-                label="Conatct No"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.emergencyContactNo"
-                size="large"
-                label="Emergency Contact No"
-              />
-            </Col>
+      <h1>Create Admin</h1>
 
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormSelectDropdown
-                name="admin.bloodGroup"
-                size="middle"
-                label="Blood Group"
-                placeholder="Select Group"
-                options={bloodGroupOptions}
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormInput
-                type="text"
-                name="admin.designation"
-                size="large"
-                label="Designation"
-              />
-            </Col>
-            <Col className="gutter-row" span={8} style={{ marginBottom: 8 }}>
-              <FormDatePicker
-                name="admin.dateOfBirth"
-                size="middle"
-                label="Date of birth"
-              />
-            </Col>
-            <Col className="gutter-row" span={12} style={{ marginBottom: 8 }}>
-              <FormTextArea
-                rows={4}
-                name="admin.presentAddress"
-                size="large"
-                label="Present address"
-              />
-            </Col>
-            <Col className="gutter-row" span={12} style={{ marginBottom: 8 }}>
-              <FormTextArea
-                rows={4}
-                name="admin.permanentAddress"
-                size="large"
-                label="Permanent address"
-              />
-            </Col>
-          </Row>
-          <Button
+      <div>
+        <Form
+          autoComplete="off"
+          autoCorrect="off"
+          autoSave="off"
+          submitHandler={onSubmit}
+          resolver={yupResolver(adminSchema)}
+        >
+          <div
             style={{
-              marginTop: 10,
+              border: "1px solid #d9d9d9",
+              borderRadius: "5px",
+              padding: "15px",
+              marginBottom: "10px",
             }}
-            type="primary"
-            htmlType="submit"
           >
-            Submit
+            <p
+              style={{
+                fontSize: "18px",
+                marginBottom: "10px",
+              }}
+            >
+              Admin Information
+            </p>
+            <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.name.firstName"
+                  size="large"
+                  label="First Name"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.name.middleName"
+                  size="large"
+                  label="Middle Name"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.name.lastName"
+                  size="large"
+                  label="Last Name"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="password"
+                  name="password"
+                  size="large"
+                  label="Password"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormSelectDropdown
+                  size="large"
+                  name="admin.gender"
+                  options={genderOptions}
+                  label="Gender"
+                  placeholder="Select"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormSelectDropdown
+                  size="large"
+                  name="admin.managementDepartment"
+                  options={departmentOptions}
+                  label="Department"
+                  placeholder="Select"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <UploadImage name="file" />
+              </Col>
+            </Row>
+          </div>
+
+          {/* basic info */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "5px",
+              padding: "15px",
+              marginBottom: "10px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "18px",
+                marginBottom: "10px",
+              }}
+            >
+              Basic Information
+            </p>
+            <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="email"
+                  name="admin.email"
+                  size="large"
+                  label="Email address"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.contactNo"
+                  size="large"
+                  label="Contact No."
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.emergencyContactNo"
+                  size="large"
+                  label="Emergency Contact No."
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormDatePicker
+                  name="admin.dateOfBirth"
+                  label="Date of birth"
+                  size="large"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormSelectDropdown
+                  size="large"
+                  name="admin.bloodGroup"
+                  options={bloodGroupOptions}
+                  label="Blood group"
+                  placeholder="Select"
+                />
+              </Col>
+              <Col
+                className="gutter-row"
+                span={8}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <FormInput
+                  type="text"
+                  name="admin.designation"
+                  size="large"
+                  label="Designation"
+                />
+              </Col>
+              <Col span={12} style={{ margin: "10px 0" }}>
+                <FormTextArea
+                  name="admin.presentAddress"
+                  label="Present address"
+                  rows={4}
+                />
+              </Col>
+
+              <Col span={12} style={{ margin: "10px 0" }}>
+                <FormTextArea
+                  name="admin.permanentAddress"
+                  label="Permanent address"
+                  rows={4}
+                />
+              </Col>
+            </Row>
+          </div>
+          <Button htmlType="submit" type="primary">
+            Create
           </Button>
-        </div>
-      </Form>
+        </Form>
+      </div>
     </div>
   );
 };
 
-export default CreateAdmin;
+export default CreateAdminPage;

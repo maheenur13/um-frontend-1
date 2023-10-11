@@ -11,6 +11,10 @@ type FormConfig = {
 type PropsType = {
   children?: ReactNode | ReactElement;
   submitHandler: SubmitHandler<any>;
+  autoComplete?: string | undefined;
+  autoCapitalize?: string | undefined;
+  autoCorrect?: string | undefined;
+  autoSave?: string | undefined;
 } & FormConfig;
 
 const Form: FC<PropsType> = ({
@@ -18,6 +22,7 @@ const Form: FC<PropsType> = ({
   submitHandler,
   defaultValues,
   resolver,
+  ...rest
 }) => {
   const formConfig: FormConfig = {};
 
@@ -38,7 +43,9 @@ const Form: FC<PropsType> = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>{children}</form>
+      <form {...rest} onSubmit={handleSubmit(onSubmit)}>
+        {children}
+      </form>
     </FormProvider>
   );
 };

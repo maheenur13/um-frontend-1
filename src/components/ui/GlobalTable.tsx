@@ -18,6 +18,7 @@ type PropsType<T> = {
   className?: string;
   footer?: TableProps<Record<string, any>>["footer"];
   title?: TableProps<Record<string, any>>["title"];
+  showSizeChanger?: boolean;
 };
 
 const GlobalTable: FC<PropsType<Record<string, any>>> = ({
@@ -36,12 +37,13 @@ const GlobalTable: FC<PropsType<Record<string, any>>> = ({
   footer,
   className,
   title,
+  showSizeChanger = true,
 }) => {
   const paginationConfig: PaginationProps = {
     pageSize,
     total,
     pageSizeOptions: [5, 10, 20],
-    showSizeChanger: true,
+    showSizeChanger: showSizeChanger,
     onChange: onPaginationChange,
     className: paginationClassName,
     style: paginationStyle,

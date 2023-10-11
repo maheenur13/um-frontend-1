@@ -12,7 +12,7 @@ const departmentApi = baseApi.injectEndpoints({
         method: "GET",
         params: arg,
       }),
-      transformResponse: async (response: IDepartment, meta: IMeta) => {
+      transformResponse: async (response: IDepartment[], meta: IMeta) => {
         return {
           departments: response,
           meta,
@@ -49,6 +49,13 @@ const departmentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.department],
     }),
+    deleteDepartment: build.mutation({
+      query: (payload) => ({
+        url: `${DEPARTMENT_URL}/${payload.id}`,
+        method: "Delete",
+      }),
+      invalidatesTags: [tagTypes.department],
+    }),
   }),
   overrideExisting: false,
 });
@@ -58,4 +65,5 @@ export const {
   useGetDepartmentsQuery,
   useGetDepartmentByIdQuery,
   useUpdateDepartmentMutation,
+  useDeleteDepartmentMutation,
 } = departmentApi;
